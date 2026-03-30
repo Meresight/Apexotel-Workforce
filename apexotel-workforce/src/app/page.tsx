@@ -54,66 +54,27 @@ export default function LandingPage() {
 
       {/* Dashboard Mock Preview */}
       <section className="px-6 md:px-16 pb-16 max-w-5xl mx-auto w-full">
-        <div className="bg-slate-50 border border-slate-200 rounded-3xl overflow-hidden shadow-xl shadow-slate-200/60">
+        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-2xl shadow-slate-200/40 transform hover:scale-[1.01] transition-transform duration-500">
           {/* Fake browser bar */}
-          <div className="bg-white border-b border-slate-100 px-5 py-3 flex items-center gap-2">
+          <div className="bg-slate-50 border-b border-slate-100 px-5 py-3 flex items-center gap-2">
             <div className="flex gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-300"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-300"></div>
-              <div className="w-3 h-3 rounded-full bg-green-300"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
             </div>
-            <div className="flex-1 mx-4 bg-slate-100 rounded-md h-6 flex items-center px-3">
-              <span className="text-xs text-slate-400">workforce.apexotel.com/dashboard</span>
+            <div className="flex-1 mx-4 bg-white rounded h-6 flex items-center px-3 border border-slate-100">
+              <span className="text-[10px] text-slate-400 font-mono">workforce.apexotel.com/dashboard</span>
             </div>
           </div>
-          {/* Fake Dashboard */}
-          <div className="flex min-h-[320px] md:min-h-[400px]">
-            {/* Sidebar */}
-            <div className="w-16 md:w-52 bg-slate-900 flex flex-col p-3 md:p-4 gap-1 shrink-0">
-              <div className="flex items-center gap-2 mb-5 px-1">
-                <Image src="/apexotel.png" alt="" width={24} height={24} className="object-contain opacity-90" />
-                <span className="text-xs font-bold text-white hidden md:block">Apexotel</span>
-              </div>
-              {['Live Roster', 'Employees', 'Tasks', 'Logs', 'Timecards'].map((item, i) => (
-                <div key={item} className={`flex items-center gap-2.5 px-2 md:px-3 py-2 rounded-lg cursor-default ${i === 0 ? 'bg-slate-700 text-white' : 'text-slate-400'}`}>
-                  <div className={`w-4 h-4 rounded-sm shrink-0 ${i === 0 ? 'bg-white/20' : 'bg-slate-700'}`}></div>
-                  <span className="text-xs font-medium hidden md:block">{item}</span>
-                </div>
-              ))}
-            </div>
-            {/* Main area */}
-            <div className="flex-1 p-5 md:p-7 space-y-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="h-5 w-36 bg-slate-200 rounded-md mb-1.5"></div>
-                  <div className="h-3.5 w-24 bg-slate-100 rounded"></div>
-                </div>
-                <div className="h-8 w-28 bg-slate-900 rounded-lg"></div>
-              </div>
-              {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {[
-                  { label: 'Clocked In', val: '8', color: 'bg-emerald-50 border-emerald-100' },
-                  { label: 'Tasks Today', val: '14', color: 'bg-blue-50 border-blue-100' },
-                  { label: 'Pending Logs', val: '3', color: 'bg-amber-50 border-amber-100' },
-                  { label: 'Timecards', val: '2', color: 'bg-purple-50 border-purple-100' },
-                ].map(s => (
-                  <div key={s.label} className={`border rounded-xl p-3 md:p-4 ${s.color}`}>
-                    <div className="text-xl md:text-2xl font-bold text-slate-900">{s.val}</div>
-                    <div className="text-xs text-slate-500 mt-0.5">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-              {/* Employee list */}
-              <div className="bg-white border border-slate-100 rounded-2xl p-4 space-y-3">
-                {['Warren J. — Clocked in 09:02 AM', 'Maria C. — Clocked in 08:55 AM', 'James T. — Not yet clocked in'].map((name, i) => (
-                  <div key={name} className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full shrink-0 ${i < 2 ? 'bg-emerald-400' : 'bg-slate-200'}`}></div>
-                    <div className={`text-xs ${i < 2 ? 'text-slate-700' : 'text-slate-400'}`}>{name}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* Real Preview Image */}
+          <div className="relative aspect-[16/9] w-full">
+            <Image 
+              src="/dashboard_preview.png" 
+              alt="Apexotel Workforce Dashboard" 
+              fill 
+              className="object-cover"
+              priority
+            />
           </div>
         </div>
       </section>

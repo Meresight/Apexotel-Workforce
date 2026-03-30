@@ -15,9 +15,15 @@ export default function LoginPage() {
   const router = useRouter()
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) router.push('/dashboard')
-    })
+    const check = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+      // Check if profile exists
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single()
+      if (profile) router.push('/dashboard')
+      else router.push('/onboarding')
+    }
+    check()
   }, [router, supabase])
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -25,66 +31,130 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
     const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
-    if (loginError) { setError(loginError.message); setLoading(false) }
-    else router.push('/dashboard')
+    if (loginError) {
+      setError(loginError.message)
+      setLoading(false)
+    } else {
+      // Check profile after login
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single()
+        if (profile) router.push('/dashboard')
+        else router.push('/onboarding')
+      }
+    }
   }
 
   return (
     <div className="min-h-screen bg-white flex">
-      {/* Left Branding Panel */}
-      <div className="hidden lg:flex flex-col w-[45%] bg-slate-50 border-r border-slate-100 p-14 justify-between">
-        <div className="flex items-center gap-3">
-          <Image src="/apexotel.png" alt="Apexotel" width={36} height={36} className="object-contain" />
-          <span className="text-base font-bold text-slate-900">Apexotel Workforce</span>
+      {/* Left — Image Panel */}
+      <div className="hidden lg:flex flex-col w-1/2 bg-slate-950 relative overflow-hidden">
+        {/* Background gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-black" />
+        
+        {/* Content */}
+        <div className="relative z-10 flex flex-col h-full p-12">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <Image src="/apexotel.png" alt="Apexotel" width={32} height={32} className="object-contain brightness-0 invert opacity-90" />
+            <span className="text-sm font-bold text-white">Apexotel Workforce</span>
+          </div>
+
+          {/* Dashboard mockup image in middle */}
+          <div className="flex-1 flex items-center justify-center py-12">
+            <div className="w-full max-w-md">
+              <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden shadow-2xl shadow-black/40 backdrop-blur">
+                <div className="bg-white/5 border-b border-white/10 px-4 py-2.5 flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-400/60"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/60"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-400/60"></div>
+                  </div>
+                  <div className="flex-1 mx-3 bg-white/5 rounded h-4"></div>
+                </div>
+                <Image
+                  src="/dashboard_preview.png"
+                  alt="Dashboard Preview"
+                  width={800}
+                  height={500}
+                  className="w-full object-cover opacity-70"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom quote */}
+          <div className="space-y-3">
+            <p className="text-white/80 text-sm leading-relaxed max-w-xs">
+              "From clock-ins to approvals — everything your team needs in one place."
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-slate-700"></div>
+              <div>
+                <p className="text-white text-xs font-semibold">Apexotel Team</p>
+                <p className="text-slate-500 text-xs">Workforce Management</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="space-y-4">
-          <h1 className="text-4xl font-extrabold text-slate-900 leading-tight">
-            Welcome<br />
-            <span className="text-slate-400">back.</span>
-          </h1>
-          <p className="text-slate-500 text-sm leading-relaxed">
-            Your team is waiting. Sign in to see the live roster, check tasks, and keep everything running smoothly.
-          </p>
-        </div>
-        <p className="text-xs text-slate-400">© 2026 Apexotel</p>
       </div>
 
-      {/* Right Form Panel */}
+      {/* Right — Form Panel */}
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
-          <div className="flex lg:hidden items-center gap-3 mb-2">
-            <Image src="/apexotel.png" alt="Apexotel" width={32} height={32} className="object-contain" />
+        <div className="w-full max-w-sm space-y-7">
+          {/* Mobile logo */}
+          <div className="flex lg:hidden items-center gap-2.5 mb-2">
+            <Image src="/apexotel.png" alt="Apexotel" width={28} height={28} className="object-contain" />
             <span className="text-sm font-bold text-slate-900">Apexotel Workforce</span>
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Sign in</h2>
-            <p className="mt-1 text-sm text-slate-500">Enter your credentials to continue</p>
+            <h1 className="text-2xl font-bold text-slate-900">Sign in</h1>
+            <p className="text-sm text-slate-500 mt-1">Enter your credentials to continue</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg">{error}</div>
+              <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl">
+                {error}
+              </div>
             )}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Email</label>
-              <input type="email" placeholder="warren@apexotel.com" value={email} onChange={e => setEmail(e.target.value)} required
-                className="w-full bg-white border border-slate-200 text-slate-900 placeholder-slate-400 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 transition" />
+              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Email</label>
+              <input
+                type="email"
+                placeholder="you@company.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                className="w-full border border-slate-200 bg-slate-50 focus:bg-white text-slate-900 placeholder-slate-400 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all"
+              />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Password</label>
-              <input type="password" placeholder="Your password" value={password} onChange={e => setPassword(e.target.value)} required
-                className="w-full bg-white border border-slate-200 text-slate-900 placeholder-slate-400 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 transition" />
+              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Password</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                className="w-full border border-slate-200 bg-slate-50 focus:bg-white text-slate-900 placeholder-slate-400 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all"
+              />
             </div>
-            <button type="submit" disabled={loading}
-              className="w-full bg-slate-900 hover:bg-slate-700 text-white font-semibold py-3 rounded-lg transition text-sm disabled:opacity-60 mt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-slate-900 hover:bg-slate-700 text-white font-semibold py-3.5 rounded-xl transition-all text-sm disabled:opacity-60 mt-1"
+            >
               {loading ? 'Signing in...' : 'Sign In →'}
             </button>
           </form>
 
           <p className="text-center text-sm text-slate-500">
             Don't have an account?{' '}
-            <Link href="/auth/register" className="text-slate-900 font-semibold hover:underline">Create one for free</Link>
+            <Link href="/auth/register" className="text-slate-900 font-semibold hover:underline">
+              Create one free
+            </Link>
           </p>
         </div>
       </div>

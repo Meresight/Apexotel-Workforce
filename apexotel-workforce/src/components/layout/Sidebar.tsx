@@ -12,7 +12,8 @@ import {
   History,
   CheckSquare,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Settings
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -91,12 +92,45 @@ export default function Sidebar({ role }: SidebarProps) {
             </Link>
           )
         })}
+
+        {/* Divider */}
+        <div className="my-4 border-t border-slate-50" />
+
+        {/* System Links */}
+        {!isMinimized && (
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 pb-1">
+            System
+          </p>
+        )}
+        {[
+          { name: 'Profile', href: '/dashboard/profile', icon: Users },
+          { name: 'Settings', href: '/dashboard/settings', icon: Settings }
+        ].map((link) => {
+          const isActive = pathname === link.href
+          const Icon = link.icon
+          return (
+            <Link
+              key={link.name}
+              href={link.href}
+              title={isMinimized ? link.name : undefined}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all group relative",
+                isActive
+                  ? "bg-slate-100 text-slate-900"
+                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+              )}
+            >
+              <Icon className={cn("shrink-0", isActive ? "text-slate-900" : "text-slate-400 group-hover:text-slate-700", isMinimized ? "w-5 h-5 mx-auto" : "w-4 h-4")} />
+              {!isMinimized && <span>{link.name}</span>}
+            </Link>
+          )
+        })}
       </nav>
 
       {/* Footer */}
       {!isMinimized && (
         <div className="p-4 border-t border-slate-100">
-          <p className="text-[10px] text-slate-400">Apexotel Workforce v1.1</p>
+          <p className="text-[10px] text-slate-400 tracking-tight font-medium outline-none">Apexotel Workforce v1.1</p>
         </div>
       )}
     </div>

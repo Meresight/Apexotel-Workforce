@@ -11,8 +11,9 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { LogOut, Settings, User } from 'lucide-react'
+import { LogOut, Settings, User, Bell } from 'lucide-react'
 import type { Profile } from '@/lib/types/database'
+import { Button } from '@/components/ui/button'
 
 interface TopNavProps {
   profile: Profile
@@ -39,8 +40,12 @@ export default function TopNav({ profile }: TopNavProps) {
       <p className="text-sm font-semibold text-slate-900 md:hidden">Apexotel</p>
 
       {/* Right — actions */}
-      <div className="flex items-center gap-2">
-        <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:text-slate-900 border border-transparent hover:border-slate-100 transition-all rounded-lg">
+          <Bell className="w-5 h-5 shadow-sm" />
+        </Button>
+
+        <span className={`text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 rounded-lg border ${
           profile.role === 'boss'
             ? 'bg-slate-900 text-white border-slate-900'
             : 'bg-slate-100 text-slate-600 border-slate-200'
@@ -63,11 +68,11 @@ export default function TopNav({ profile }: TopNavProps) {
               <p className="text-xs text-slate-400 capitalize">{profile.role}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="mx-1" />
-            <DropdownMenuItem className="cursor-pointer rounded-lg text-sm">
+            <DropdownMenuItem className="cursor-pointer rounded-lg text-sm" onClick={() => router.push('/dashboard/profile')}>
               <User className="mr-2 h-4 w-4 text-slate-400" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer rounded-lg text-sm">
+            <DropdownMenuItem className="cursor-pointer rounded-lg text-sm" onClick={() => router.push('/dashboard/settings')}>
               <Settings className="mr-2 h-4 w-4 text-slate-400" />
               Settings
             </DropdownMenuItem>

@@ -41,11 +41,13 @@ export default function RegisterPage() {
   if (success) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-6">
-        <div className="text-center space-y-4 max-w-md">
-          <div className="text-5xl">📧</div>
-          <h2 className="text-2xl font-bold text-slate-900">Check your email!</h2>
-          <p className="text-slate-500">We sent a confirmation link to <strong className="text-slate-800">{email}</strong>. Click it to activate your account.</p>
-          <Link href="/auth/login" className="inline-block mt-4 text-sm text-slate-400 underline hover:text-slate-700">Back to Sign In</Link>
+        <div className="max-w-sm text-center space-y-4">
+          <div className="w-16 h-16 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-center mx-auto">
+            <span className="text-2xl">📧</span>
+          </div>
+          <h2 className="text-xl font-bold text-slate-900">Check your email</h2>
+          <p className="text-sm text-slate-500">We sent a confirmation link to <strong className="text-slate-800">{email}</strong>. Click it to continue.</p>
+          <Link href="/auth/login" className="inline-block mt-2 text-sm text-slate-400 hover:text-slate-700 underline">Back to Sign In</Link>
         </div>
       </div>
     )
@@ -53,68 +55,80 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-white flex">
-      {/* Left Branding Panel */}
-      <div className="hidden lg:flex flex-col w-[45%] bg-slate-50 border-r border-slate-100 p-14 justify-between">
-        <div className="flex items-center gap-3">
-          <Image src="/apexotel.png" alt="Apexotel" width={36} height={36} className="object-contain" />
-          <span className="text-base font-bold text-slate-900">Apexotel Workforce</span>
-        </div>
-        <div className="space-y-6">
-          <h1 className="text-4xl font-extrabold text-slate-900 leading-tight">
-            Your team's<br />
-            <span className="text-slate-400">command center.</span>
-          </h1>
-          <p className="text-slate-500 text-sm leading-relaxed">
-            Create a free workspace, invite your team, and start managing work in minutes.
-          </p>
-          <div className="space-y-3 pt-2">
-            {['Real-time clock-in tracking', 'Task assignment & management', 'Payroll-ready timecard exports'].map(f => (
-              <div key={f} className="flex items-center gap-3 text-sm text-slate-600">
-                <span className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                  <span className="text-emerald-600 text-xs font-bold">✓</span>
-                </span>
-                {f}
-              </div>
-            ))}
+      {/* Left — Image Panel */}
+      <div className="hidden lg:flex flex-col w-1/2 bg-slate-950 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-black" />
+        <div className="relative z-10 flex flex-col h-full p-12">
+          <div className="flex items-center gap-3">
+            <Image src="/apexotel.png" alt="Apexotel" width={32} height={32} className="object-contain brightness-0 invert opacity-90" />
+            <span className="text-sm font-bold text-white">Apexotel Workforce</span>
           </div>
+
+          <div className="flex-1 flex flex-col justify-center space-y-8">
+            <div className="space-y-4">
+              <h2 className="text-3xl font-extrabold text-white leading-tight">
+                Built for teams<br />
+                <span className="text-slate-400">that mean business.</span>
+              </h2>
+              <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
+                Create your free workspace in 2 minutes. Manage your entire workforce from day one.
+              </p>
+            </div>
+
+            {/* Feature list */}
+            <div className="space-y-3">
+              {[
+                { icon: '⏱', text: 'Real-time clock-in tracking' },
+                { icon: '✅', text: 'Task delegation & monitoring' },
+                { icon: '📋', text: 'Daily logs & timecard approvals' },
+                { icon: '📊', text: 'Payroll-ready CSV exports' },
+              ].map(f => (
+                <div key={f.text} className="flex items-center gap-3">
+                  <div className="w-7 h-7 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center text-sm shrink-0">{f.icon}</div>
+                  <span className="text-slate-300 text-sm">{f.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-xs text-slate-600">© 2026 Apexotel. All rights reserved.</p>
         </div>
-        <p className="text-xs text-slate-400">© 2026 Apexotel</p>
       </div>
 
-      {/* Right Form Panel */}
+      {/* Right — Form Panel */}
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
-          <div className="flex lg:hidden items-center gap-3 mb-2">
-            <Image src="/apexotel.png" alt="Apexotel" width={32} height={32} className="object-contain" />
+        <div className="w-full max-w-sm space-y-7">
+          <div className="flex lg:hidden items-center gap-2.5 mb-2">
+            <Image src="/apexotel.png" alt="Apexotel" width={28} height={28} className="object-contain" />
             <span className="text-sm font-bold text-slate-900">Apexotel Workforce</span>
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Create your account</h2>
-            <p className="mt-1 text-sm text-slate-500">Free forever. No credit card required.</p>
+            <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>
+            <p className="text-sm text-slate-500 mt-1">Free forever. No credit card required.</p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg">{error}</div>
+              <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl">{error}</div>
             )}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Full Name</label>
+              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Full Name</label>
               <input type="text" placeholder="Warren Jacaban" value={fullName} onChange={e => setFullName(e.target.value)} required
-                className="w-full bg-white border border-slate-200 text-slate-900 placeholder-slate-400 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 transition" />
+                className="w-full border border-slate-200 bg-slate-50 focus:bg-white text-slate-900 placeholder-slate-400 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Email</label>
-              <input type="email" placeholder="warren@apexotel.com" value={email} onChange={e => setEmail(e.target.value)} required
-                className="w-full bg-white border border-slate-200 text-slate-900 placeholder-slate-400 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 transition" />
+              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Email</label>
+              <input type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} required
+                className="w-full border border-slate-200 bg-slate-50 focus:bg-white text-slate-900 placeholder-slate-400 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Password</label>
+              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Password</label>
               <input type="password" placeholder="Min. 6 characters" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
-                className="w-full bg-white border border-slate-200 text-slate-900 placeholder-slate-400 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 transition" />
+                className="w-full border border-slate-200 bg-slate-50 focus:bg-white text-slate-900 placeholder-slate-400 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all" />
             </div>
             <button type="submit" disabled={loading}
-              className="w-full bg-slate-900 hover:bg-slate-700 text-white font-semibold py-3 rounded-lg transition text-sm disabled:opacity-60 mt-2">
+              className="w-full bg-slate-900 hover:bg-slate-700 text-white font-semibold py-3.5 rounded-xl transition-all text-sm disabled:opacity-60 mt-1">
               {loading ? 'Creating account...' : 'Create Account →'}
             </button>
           </form>
