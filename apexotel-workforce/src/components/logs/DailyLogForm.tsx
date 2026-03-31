@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { ClipboardList, CheckCircle2, Save } from 'lucide-react'
+import { ClipboardList, CheckCircle2, Save, Sparkles, Send, Info, Calendar } from 'lucide-react'
 import type { Task, DailyLog } from '@/lib/types/database'
+import { cn } from '@/lib/utils'
 
 export default function DailyLogForm() {
   const [summary, setSummary] = useState('')
@@ -28,7 +28,6 @@ export default function DailyLogForm() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      // 1. Fetch today's log
       const { data: log } = await supabase
         .from('daily_logs')
         .select('*')
@@ -42,7 +41,6 @@ export default function DailyLogForm() {
         setSelectedTasks(log.tasks_completed || [])
       }
 
-      // 2. Fetch today's completed tasks
       const { data: completedTasks } = await supabase
         .from('tasks')
         .select('*')
@@ -81,6 +79,7 @@ export default function DailyLogForm() {
   }
 
   const toggleTask = (taskId: string) => {
+    if (existingLog?.status === 'reviewed') return
     setSelectedTasks(prev => 
       prev.includes(taskId) 
         ? prev.filter(id => id !== taskId) 
@@ -88,32 +87,57 @@ export default function DailyLogForm() {
     )
   }
 
-  if (loading) return <div className="space-y-4 animate-pulse"><div className="h-64 bg-slate-100 rounded-2xl" /></div>
+  if (loading) return (
+    <div className="max-w-3xl mx-auto space-y-6">
+       <div className="h-48 bg-slate-100 rounded-[2.5rem] animate-pulse" />
+       <div className="h-[400px] bg-slate-50 rounded-[2.5rem] animate-pulse" />
+    </div>
+  )
 
   return (
-    <Card className="max-w-3xl mx-auto border-slate-200 shadow-xl overflow-hidden bg-white">
-      <CardHeader className="bg-slate-900 px-8 py-10 relative">
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10 pointer-events-none">
-          <ClipboardList className="w-64 h-64 -translate-y-10 -translate-x-10 text-white" />
+    <div className="max-w-4xl mx-auto animate-in fade-in duration-700 pb-20 selection:bg-blue-100">
+      {/* Premium Header Card */}
+      <div className="bg-[#020617] rounded-[2.5rem] p-10 md:p-14 relative overflow-hidden shadow-2xl mb-10">
+        <div className="absolute top-0 right-0 p-10 opacity-10 pointer-events-none">
+           <ClipboardList className="w-64 h-64 -translate-y-10 translate-x-10 text-blue-400" />
         </div>
-        <CardTitle className="text-3xl font-black text-white tracking-tight flex items-center relative z-10 uppercase">
-          <ClipboardList className="w-8 h-8 mr-4 text-blue-400" />
-          End of Day Log
-        </CardTitle>
-        <p className="text-slate-400 font-bold tracking-widest uppercase text-xs mt-2 relative z-10">
-          Reporting for {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-        </p>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="px-8 py-8 space-y-8">
+        
+        <div className="relative z-10 space-y-6">
+          <div className="flex items-center gap-4">
+             <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <Sparkles className="w-7 h-7 text-white" />
+             </div>
+             <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight uppercase">Daily Log Portal</h1>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-4">
+             <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl backdrop-blur-md flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-blue-400" />
+                <span className="text-[10px] font-black text-white uppercase tracking-widest pt-0.5">
+                   {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+                </span>
+             </div>
+             <div className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl backdrop-blur-md flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest pt-0.5">Transmission Active</span>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Form */}
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-200/40 p-8 md:p-12 space-y-10">
+          
+          {/* Summary Section */}
           <div className="space-y-4">
-            <Label className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center">
-              Accomplishment Summary
-              <span className="ml-2 h-1.5 w-1.5 rounded-full bg-blue-500" />
-            </Label>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] ml-1 flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.4)]" />
+              Accomplishment Intelligence
+            </label>
             <Textarea 
-              placeholder="Describe what you worked on today, any challenges faced, or key wins..."
-              className="min-h-[160px] border-slate-200 focus:ring-slate-300 rounded-xl p-4 text-sm font-medium leading-relaxed"
+              placeholder="Synthesize your daily activities, challenges, and primary objectives completed today..."
+              className="min-h-[200px] border-slate-200 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 rounded-[1.5rem] p-6 text-sm font-medium leading-relaxed bg-slate-50 transition-all placeholder:text-slate-400"
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               required
@@ -121,64 +145,107 @@ export default function DailyLogForm() {
             />
           </div>
 
-          <div className="space-y-4 pt-4 border-t border-slate-100">
-            <Label className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center">
-              Tasks Completed Today
-              <span className="ml-2 h-1.5 w-1.5 rounded-full bg-green-500" />
-            </Label>
+          {/* Tasks Section */}
+          <div className="space-y-6 pt-6 border-t border-slate-100">
+            <div className="flex items-center justify-between px-1">
+               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2">
+                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                 Validated Tasks
+               </label>
+               {tasks.length > 0 && (
+                 <span className="text-[9px] font-black px-2 py-1 bg-slate-100 text-slate-500 rounded-full uppercase tracking-widest">
+                    {selectedTasks.length} / {tasks.length} Selected
+                 </span>
+               )}
+            </div>
+
             {tasks.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {tasks.map(task => (
                   <div 
                     key={task.id} 
-                    className={`flex items-center space-x-3 p-4 rounded-xl border transition-all cursor-pointer ${
+                    className={cn(
+                      "group relative flex items-center gap-4 p-5 rounded-2xl border transition-all cursor-pointer",
                       selectedTasks.includes(task.id) 
-                        ? 'border-green-300 bg-green-50 font-bold text-green-900 shadow-sm' 
-                        : 'border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-200'
-                    }`}
+                        ? 'border-emerald-500/20 bg-emerald-50/50 shadow-sm' 
+                        : 'border-slate-100 bg-slate-50 hover:border-slate-300 hover:bg-white'
+                    )}
                     onClick={() => toggleTask(task.id)}
                   >
-                    <Checkbox 
-                      id={task.id} 
-                      checked={selectedTasks.includes(task.id)}
-                      onCheckedChange={() => toggleTask(task.id)}
-                      className="border-slate-300 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
-                    />
-                    <label 
-                      htmlFor={task.id} 
-                      className="text-xs flex-1 cursor-pointer select-none leading-none"
-                    >
-                      {task.title}
-                    </label>
-                    <CheckCircle2 className={`w-4 h-4 ${selectedTasks.includes(task.id) ? 'text-green-600 opacity-100' : 'text-slate-200 opacity-0'}`} />
+                    <div className={cn(
+                       "w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all",
+                       selectedTasks.includes(task.id) 
+                         ? "bg-emerald-500 border-emerald-500" 
+                         : "bg-white border-slate-200 group-hover:border-slate-300"
+                    )}>
+                       {selectedTasks.includes(task.id) && <CheckCircle2 className="w-4 h-4 text-white" />}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                       <p className={cn(
+                         "text-xs leading-none tracking-tight",
+                         selectedTasks.includes(task.id) ? "font-black text-emerald-950" : "font-bold text-slate-900"
+                       )}>
+                         {task.title}
+                       </p>
+                       <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                         Completed Strategy
+                       </p>
+                    </div>
+
+                    <div className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center transition-all",
+                      selectedTasks.includes(task.id) ? "bg-white text-emerald-500 scale-100 shadow-sm" : "opacity-0 scale-50"
+                    )}>
+                       <CheckCircle2 className="w-4 h-4" />
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-100">
-                <p className="text-xs font-bold text-slate-400 italic">No tasks were marked as 'Done' today.</p>
+              <div className="p-16 text-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem]">
+                <div className="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-slate-200/50">
+                   <Info className="w-6 h-6 text-slate-200" />
+                </div>
+                <h3 className="text-sm font-black text-slate-950 tracking-tight">No completed items detected</h3>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.15em] max-w-xs mx-auto leading-relaxed mt-2">
+                   Only tasks marked as 'Done' in your active board will appear here for verification.
+                </p>
               </div>
             )}
           </div>
-        </CardContent>
-        <CardFooter className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">
-            {existingLog ? 'Log already exists (Updating)' : 'Ready to submit'}
-          </p>
-          <Button 
+        </div>
+
+        {/* Action Bar */}
+        <div className="bg-white border border-slate-200 rounded-[2rem] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl shadow-slate-200/20">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
+               <Info className="w-5 h-5 text-slate-400" />
+            </div>
+            <div>
+               <p className="text-[10px] font-black text-slate-950 uppercase tracking-widest leading-none">Status Summary</p>
+               <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1.5">
+                  {existingLog ? 'Revision Protocol Active' : 'Ready for Strategic Filing'}
+               </p>
+            </div>
+          </div>
+          
+          <button 
             type="submit" 
-            className="bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-widest text-xs h-12 px-8 rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50"
+            className="bg-[#020617] hover:bg-slate-900 text-white font-black uppercase tracking-[0.2em] text-xs h-16 px-12 rounded-2xl shadow-xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 w-full md:w-auto"
             disabled={submitting || existingLog?.status === 'reviewed'}
           >
-            {submitting ? 'Submitting...' : (
-              <span className="flex items-center">
-                <Save className="w-4 h-4 mr-2" />
-                {existingLog ? 'Update Log' : 'Submit End of Day Log'}
-              </span>
+            {submitting ? (
+              'Transmitting Intelligence...'
+            ) : (
+              <>
+                <Send className="w-4 h-4 text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                {existingLog ? 'Update Intelligence' : 'Deploy Daily Report'}
+              </>
             )}
-          </Button>
-        </CardFooter>
+          </button>
+        </div>
       </form>
-    </Card>
+    </div>
   )
 }

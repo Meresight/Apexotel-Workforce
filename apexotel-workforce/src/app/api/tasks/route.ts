@@ -8,10 +8,20 @@ export async function GET(req: Request) {
 
   if (!session) return new NextResponse('Unauthorized', { status: 401 })
 
+  // Fetch profile for company_id isolation
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('company_id')
+    .eq('id', session.user.id)
+    .single()
+
+  if (!profile?.company_id) return new NextResponse('Forbidden', { status: 403 })
+
   const { searchParams } = new URL(req.url)
   const employeeId = searchParams.get('employee_id')
 
   let query = supabase.from('tasks').select('*')
+    .eq('company_id', profile.company_id)
   
   if (employeeId) {
     query = query.eq('assigned_to', employeeId)

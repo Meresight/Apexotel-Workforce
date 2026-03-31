@@ -3,15 +3,16 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Clock, MapPin, Play, Square } from 'lucide-react'
+import { Clock, MapPin, Play, Square, Timer, Activity } from 'lucide-react'
 import { formatDistanceToNow, parseISO } from 'date-fns'
 import { createClient } from '@/lib/supabase/client'
 import type { TimeEntry } from '@/lib/types/database'
+import { cn } from '@/lib/utils'
 
 export default function ClockWidget() {
   const [activeEntry, setActiveEntry] = useState<TimeEntry | null>(null)
   const [loading, setLoading] = useState(true)
-  const [elapsed, setElapsed] = useState<string>('0h 0m')
+  const [elapsed, setElapsed] = useState<string>('00 : 00')
   const supabase = createClient()
 
   const fetchActiveEntry = async () => {
@@ -41,7 +42,8 @@ export default function ClockWidget() {
       const diff = new Date().getTime() - start.getTime()
       const hours = Math.floor(diff / (1000 * 60 * 60))
       const minutes = Math.floor((diff / (1000 * 60)) % 60)
-      setElapsed(`${hours}h ${minutes}m`)
+      const seconds = Math.floor((diff / 1000) % 60)
+      setElapsed(`${hours.toString().padStart(2, '0')} : ${minutes.toString().padStart(2, '0')} : ${seconds.toString().padStart(2, '0')}`)
     }, 1000)
 
     return () => clearInterval(interval)
@@ -65,104 +67,133 @@ export default function ClockWidget() {
       }
     }
 
-    const res = await fetch('/api/clock/in', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ location })
-    })
+    try {
+      const res = await fetch('/api/clock/in', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ location })
+      })
 
-    if (res.ok) {
-      await fetchActiveEntry()
-    } else {
-      const err = await res.json()
-      alert(err.error || 'Failed to clock in')
+      if (res.ok) {
+        await fetchActiveEntry()
+      } else {
+        const err = await res.json()
+        alert(err.error || 'Failed to clock in')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Network error or server unreachable')
     }
     setLoading(false)
   }
 
   const handleClockOut = async () => {
     setLoading(true)
-    const res = await fetch('/api/clock/out', {
-      method: 'PATCH'
-    })
+    try {
+      const res = await fetch('/api/clock/out', {
+        method: 'PATCH'
+      })
 
-    if (res.ok) {
-      setActiveEntry(null)
-      setElapsed('0h 0m')
-    } else {
-      const err = await res.json()
-      alert(err.error || 'Failed to clock out')
+      if (res.ok) {
+        setActiveEntry(null)
+        setElapsed('00 : 00')
+      } else {
+        const err = await res.json()
+        alert(err.error || 'Failed to clock out')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Network error or server unreachable')
     }
     setLoading(false)
   }
 
   if (loading && !activeEntry) {
     return (
-      <Card className="w-full animate-pulse bg-slate-100 h-48 border-none" />
+      <div className="w-full h-[320px] bg-white border border-slate-200 rounded-[2.5rem] animate-pulse" />
     )
   }
 
   return (
-    <Card className={`w-full border-2 transition-all duration-300 ${activeEntry ? 'border-green-500 bg-green-50/30' : 'border-slate-200 bg-white'}`}>
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center text-lg font-bold text-slate-800">
-          <Clock className="w-5 h-5 mr-2" />
-          Attendance
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex flex-col items-center justify-center py-4">
-          {activeEntry ? (
-            <>
-              <div className="text-4xl font-extrabold text-green-600 mb-1 tracking-tighter">
-                {elapsed}
-              </div>
-              <p className="text-sm text-green-700 font-medium">
-                Clocked in since {new Date(activeEntry.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="text-4xl font-extrabold text-slate-300 mb-1 tracking-tighter">
-                0h 0m
-              </div>
-              <p className="text-sm text-slate-500 font-medium uppercase tracking-wide">
-                Ready to work?
-              </p>
-            </>
-          )}
-        </div>
+    <div className={cn(
+      "group relative w-full bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-2xl shadow-slate-200/50 transition-all duration-500 overflow-hidden",
+      activeEntry ? "border-emerald-500/20 ring-4 ring-emerald-500/5 shadow-emerald-500/10" : "hover:border-blue-500/10"
+    )}>
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-700">
+         <Timer className="w-48 h-48 text-slate-900" />
+      </div>
 
-        <div className="flex gap-4">
-          {!activeEntry ? (
-            <Button 
-              onClick={handleClockIn} 
-              disabled={loading}
-              className="flex-1 h-14 text-lg font-bold bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-200 transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <Play className="w-5 h-5 mr-2 fill-current" />
-              Clock In
-            </Button>
-          ) : (
-            <Button 
-              onClick={handleClockOut} 
-              disabled={loading}
-              variant="destructive"
-              className="flex-1 h-14 text-lg font-bold bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-200 transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <Square className="w-5 h-5 mr-2 fill-current" />
-              Clock Out
-            </Button>
-          )}
+      <div className="flex items-center gap-4 mb-10">
+        <div className={cn(
+          "w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110",
+          activeEntry ? "bg-emerald-500 text-white shadow-emerald-500/20" : "bg-blue-600 text-white shadow-blue-500/20"
+        )}>
+          {activeEntry ? <Activity className="w-6 h-6 animate-pulse" /> : <Clock className="w-6 h-6" />}
         </div>
+        <div className="min-w-0">
+          <h3 className="text-xl font-black text-slate-950 tracking-tight leading-none">Shift Core</h3>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 pl-0.5">Real-time Tracker</p>
+        </div>
+      </div>
 
-        {activeEntry?.location && (
-          <div className="pt-2 flex items-center justify-center text-xs text-slate-500 font-medium italic">
-            <MapPin className="w-3 h-3 mr-1" />
-            Location captured on clock-in
+      <div className="flex flex-col items-center justify-center py-6 mb-8 relative z-10">
+        <div className={cn(
+          "text-5xl font-black tracking-tighter mb-2 tabular-nums transition-colors duration-500",
+          activeEntry ? "text-emerald-600 drop-shadow-sm" : "text-slate-300"
+        )}>
+          {elapsed}
+        </div>
+        {activeEntry ? (
+          <div className="flex items-center gap-2 px-4 py-1.5 bg-emerald-50 border border-emerald-100 rounded-full animate-in fade-in slide-in-from-bottom-2">
+            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest pt-0.5">
+              Active since {new Date(activeEntry.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          </div>
+        ) : (
+          <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2 pl-1 italic">
+             No active session
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 relative z-10">
+        {!activeEntry ? (
+          <button 
+            onClick={handleClockIn} 
+            disabled={loading}
+            className="group/btn relative w-full h-16 bg-[#020617] hover:bg-slate-900 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-[0.98] disabled:opacity-50 overflow-hidden shadow-xl shadow-slate-200"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-indigo-600/10 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+            <span className="relative flex items-center justify-center gap-3">
+              <Play className="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" />
+              Begin Shift
+            </span>
+          </button>
+        ) : (
+          <button 
+            onClick={handleClockOut} 
+            disabled={loading}
+            className="group/btn relative w-full h-16 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-[0.98] disabled:opacity-50 overflow-hidden shadow-xl shadow-rose-200"
+          >
+            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+            <span className="relative flex items-center justify-center gap-3">
+              <Square className="w-4 h-4 fill-current group-hover/btn:scale-110 transition-transform" />
+              End Session
+            </span>
+          </button>
+        )}
+      </div>
+
+      {activeEntry?.location && (
+        <div className="mt-8 pt-8 border-t border-slate-50 flex items-center justify-center gap-2 group/loc">
+          <div className="w-6 h-6 rounded-lg bg-slate-50 flex items-center justify-center transition-colors group-hover/loc:bg-blue-50">
+            <MapPin className="w-3 h-3 text-slate-400 group-hover/loc:text-blue-500 transition-colors" />
+          </div>
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pt-0.5">Location verified</span>
+        </div>
+      )}
+    </div>
   )
 }

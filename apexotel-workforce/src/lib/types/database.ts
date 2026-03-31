@@ -24,6 +24,7 @@ export interface Profile {
 
 export interface TimeEntry {
   id: string
+  company_id: string
   employee_id: string
   clock_in: string
   clock_out: string | null
@@ -31,11 +32,14 @@ export interface TimeEntry {
   location: string | null
   status: TimeEntryStatus
   notes: string | null
+  adjust_in: string | null
+  adjust_out: string | null
   created_at: string
 }
 
 export interface DailyLog {
   id: string
+  company_id: string
   employee_id: string
   log_date: string
   summary: string

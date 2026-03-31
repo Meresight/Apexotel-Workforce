@@ -35,10 +35,22 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { log_date, summary, tasks_completed, status } = body
 
+  // Fetch profile for company_id
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('company_id')
+    .eq('id', session.user.id)
+    .single()
+
+  if (profileError || !profile?.company_id) {
+    return NextResponse.json({ error: 'User workspace profile not found.' }, { status: 404 })
+  }
+
   const { data, error } = await supabase
     .from('daily_logs')
     .upsert({
       employee_id: session.user.id,
+      company_id: profile.company_id,
       log_date,
       summary,
       tasks_completed,

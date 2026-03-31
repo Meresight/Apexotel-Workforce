@@ -88,7 +88,7 @@ export default function LogReviewCard({ log, onReview }: LogReviewCardProps) {
         <div className="space-y-3 pt-6 border-t border-slate-50">
            <div className="flex items-center text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
               <MessageSquare className="w-3 h-3 mr-2" />
-              Direct Boss Feedback
+              Direct Manager Feedback
            </div>
            <Textarea 
              placeholder="Add a note or feedback for the employee..."

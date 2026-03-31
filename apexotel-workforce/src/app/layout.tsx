@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Apexotel Workforce",
-  description: "Boss & Employee Time Tracking + Task Management System",
+  description: "Manager & Employee Time Tracking + Task Management System",
 };
 
 export default function RootLayout({

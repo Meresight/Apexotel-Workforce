@@ -6,7 +6,7 @@ export async function PATCH() {
   const supabase = createRouteHandlerClient({ cookies })
   const { data: { session } } = await supabase.auth.getSession()
 
-  if (!session) return new NextResponse('Unauthorized', { status: 401 })
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   // 1. Find open entry
   const { data: existing, error: findError } = await supabase

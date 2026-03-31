@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import type { Profile } from '@/lib/types/database'
-import { ClipboardList, User, Calendar, Flag, Save } from 'lucide-react'
+import { ClipboardList, User, Calendar, Flag, Save, Sparkles, Send } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface AssignTaskModalProps {
   open: boolean
@@ -85,109 +86,112 @@ export default function AssignTaskModal({ open, onOpenChange, onSuccess }: Assig
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-white rounded-3xl p-0 border-none shadow-2xl overflow-hidden">
-        <div className="bg-slate-900 p-8">
-          <DialogTitle className="text-2xl font-black text-white flex items-center uppercase tracking-tight">
-            <ClipboardList className="w-7 h-7 mr-4 text-blue-400" />
-            Assign New Task
+      <DialogContent className="sm:max-w-[540px] bg-white rounded-[2.5rem] p-0 border-none shadow-2xl overflow-hidden outline-none">
+        <div className="bg-[#020617] p-10 relative overflow-hidden">
+          {/* Decor */}
+          <div className="absolute top-0 right-0 p-8 opacity-10">
+             <Sparkles className="w-24 h-24 text-blue-400" />
+          </div>
+          
+          <DialogTitle className="text-2xl font-black text-white flex items-center uppercase tracking-tight relative z-10">
+            <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center mr-4 shadow-lg shadow-blue-500/20">
+               <ClipboardList className="w-6 h-6 text-white" />
+            </div>
+            New Assignment
           </DialogTitle>
-          <DialogDescription className="text-slate-400 font-bold tracking-widest uppercase text-[10px] mt-2 italic">
-            Delegate responsibilities to your team
+          <DialogDescription className="text-slate-400 font-bold tracking-[0.2em] uppercase text-[10px] mt-4 pl-1 relative z-10">
+             Strategic Workforce Delegation
           </DialogDescription>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="p-10 space-y-8">
+          <div className="space-y-6">
              <div className="space-y-2">
-               <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center">
-                 <User className="w-3 h-3 mr-2 text-slate-900" />
-                 Assign To
-               </Label>
+               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-2">
+                 <User className="w-3 h-3 text-slate-900" />
+                 Target Personnel
+               </label>
                <Select 
                  onValueChange={(v) => setFormData({...formData, assigned_to: v})} 
                  required
                >
-                 <SelectTrigger className="h-12 border-slate-200 rounded-xl font-bold bg-slate-50">
-                    <SelectValue placeholder="Select an employee" />
+                 <SelectTrigger className="h-14 border-slate-200 rounded-2xl font-bold bg-slate-50 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
+                    <SelectValue placeholder="Select staff member" />
                  </SelectTrigger>
-                 <SelectContent className="bg-white rounded-xl shadow-xl">
+                 <SelectContent className="bg-white rounded-2xl shadow-2xl border-slate-200 p-2">
                    {employees.map(emp => (
-                     <SelectItem key={emp.id} value={emp.id} className="font-bold text-slate-700">{emp.full_name}</SelectItem>
+                     <SelectItem key={emp.id} value={emp.id} className="font-bold text-xs py-3 rounded-xl">{emp.full_name}</SelectItem>
                    ))}
                  </SelectContent>
                </Select>
              </div>
 
              <div className="space-y-2">
-               <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Task Title</Label>
+               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Objective Title</label>
                <Input 
-                 placeholder="e.g. Prepare Quarter Report" 
+                 placeholder="e.g. System Audit Phase 1" 
                  value={formData.title}
                  onChange={(e) => setFormData({...formData, title: e.target.value})}
                  required
-                 className="h-12 border-slate-200 rounded-xl font-bold bg-slate-50 focus:ring-slate-300"
+                 className="h-14 border-slate-200 rounded-2xl font-bold bg-slate-50 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
                />
              </div>
 
              <div className="space-y-2">
-               <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-slate-900">Description</Label>
+               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Context / Details</label>
                <Textarea 
-                 placeholder="Provide more details about the task..."
+                 placeholder="Define task parameters and expectations..."
                  value={formData.description}
                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                 className="min-h-[100px] border-slate-200 rounded-xl font-medium bg-slate-50 focus:ring-slate-300 p-4"
+                 className="min-h-[120px] border-slate-200 rounded-2xl font-medium bg-slate-50 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all p-5"
                />
              </div>
 
-             <div className="grid grid-cols-2 gap-4">
+             <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                   <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center">
-                      <Flag className="w-3 h-3 mr-2" />
+                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-2">
+                      <Flag className="w-3 h-3" />
                       Priority
-                   </Label>
+                   </label>
                    <Select 
                      value={formData.priority}
                      onValueChange={(v) => setFormData({...formData, priority: v})}
                    >
-                     <SelectTrigger className="h-12 border-slate-200 rounded-xl font-bold bg-slate-50">
+                     <SelectTrigger className="h-14 border-slate-200 rounded-2xl font-bold bg-slate-50 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
                         <SelectValue />
                      </SelectTrigger>
-                     <SelectContent className="bg-white rounded-xl shadow-xl">
-                       <SelectItem value="low" className="font-bold text-blue-600">Low</SelectItem>
-                       <SelectItem value="medium" className="font-bold text-amber-600">Medium</SelectItem>
-                       <SelectItem value="high" className="font-bold text-red-600">High</SelectItem>
+                     <SelectContent className="bg-white rounded-2xl shadow-2xl border-slate-200 p-2">
+                       <SelectItem value="low" className="font-bold text-[10px] uppercase tracking-widest text-blue-600 py-3 rounded-xl cursor-pointer">Low Intensity</SelectItem>
+                       <SelectItem value="medium" className="font-bold text-[10px] uppercase tracking-widest text-amber-600 py-3 rounded-xl cursor-pointer">Standard Op</SelectItem>
+                       <SelectItem value="high" className="font-bold text-[10px] uppercase tracking-widest text-rose-600 py-3 rounded-xl cursor-pointer">Critical Path</SelectItem>
                      </SelectContent>
                    </Select>
                 </div>
                 <div className="space-y-2">
-                   <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center">
-                      <Calendar className="w-3 h-3 mr-2" />
-                      Due Date
-                   </Label>
+                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-2">
+                      <Calendar className="w-3 h-3" />
+                      Deadline
+                   </label>
                    <Input 
                      type="date"
                      value={formData.due_date}
                      onChange={(e) => setFormData({...formData, due_date: e.target.value})}
-                     className="h-12 border-slate-200 rounded-xl font-bold bg-slate-50 focus:ring-slate-300"
+                     className="h-14 border-slate-200 rounded-2xl font-bold bg-slate-50 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
                    />
                 </div>
              </div>
           </div>
 
-          <DialogFooter className="pt-4 border-t border-slate-50">
-            <Button 
+          <div className="pt-6 border-t border-slate-50 flex items-center gap-4">
+            <button 
               type="submit" 
-              className="bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-widest text-xs h-14 w-full rounded-2xl shadow-lg transition-all active:scale-95"
+              className="bg-[#020617] hover:bg-slate-900 text-white font-black uppercase tracking-[0.2em] text-xs h-16 w-full rounded-2xl shadow-xl transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
               disabled={loading}
             >
-              {loading ? 'Creating Task...' : (
-                <span className="flex items-center">
-                  <Save className="w-5 h-5 mr-3 text-blue-400" />
-                  Assign Task
-                </span>
-              )}
-            </Button>
-          </DialogFooter>
+              <Send className="w-4 h-4 text-blue-400" />
+              {loading ? 'Transmitting...' : 'Deploy Assignment'}
+            </button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

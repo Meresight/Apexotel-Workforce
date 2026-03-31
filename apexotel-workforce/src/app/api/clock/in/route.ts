@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   const supabase = createRouteHandlerClient({ cookies })
   const { data: { session } } = await supabase.auth.getSession()
 
-  if (!session) return new NextResponse('Unauthorized', { status: 401 })
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { location } = await req.json()
 
@@ -23,20 +23,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'You are already clocked in.' }, { status: 409 })
   }
 
-  // 2. Fetch profile for timezone (optional, default to UTC for now)
-  const { data: profile } = await supabase
+  // 2. Fetch profile for company_id
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('company_id')
     .eq('id', session.user.id)
     .single()
 
+  if (profileError || !profile?.company_id) {
+    return NextResponse.json({ error: 'User workspace profile not found.' }, { status: 404 })
+  }
+
   const workDate = getTodayDateString()
 
-  // 3. Insert new entry
+  // 3. Insert new entry with company_id
   const { data, error } = await supabase
     .from('time_entries')
     .insert({
       employee_id: session.user.id,
+      company_id: profile.company_id,
       clock_in: new Date().toISOString(),
       work_date: workDate,
       location,

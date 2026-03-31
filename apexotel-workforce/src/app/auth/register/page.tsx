@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import Image from 'next/image'
+import { ArrowLeft, ArrowRight, CheckCircle2, Mail, Lock, User, Loader2 } from 'lucide-react'
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState('')
@@ -40,102 +41,181 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-6">
-        <div className="max-w-sm text-center space-y-4">
-          <div className="w-16 h-16 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-center mx-auto">
-            <span className="text-2xl">📧</span>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 selection:bg-brand-accent/30">
+        <div className="w-full max-w-md bg-white border border-slate-200 rounded-[2.5rem] p-12 text-center shadow-2xl shadow-slate-200/50 animate-in fade-in zoom-in duration-500">
+          <div className="w-20 h-20 bg-emerald-50 border border-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-emerald-500/10">
+            <Mail className="w-10 h-10 text-emerald-600" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Check your email</h2>
-          <p className="text-sm text-slate-500">We sent a confirmation link to <strong className="text-slate-800">{email}</strong>. Click it to continue.</p>
-          <Link href="/auth/login" className="inline-block mt-2 text-sm text-slate-400 hover:text-slate-700 underline">Back to Sign In</Link>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-4">Check your inbox</h2>
+          <p className="text-slate-500 font-medium leading-relaxed mb-10">
+            We've sent a secure confirmation link to <br />
+            <strong className="text-slate-900">{email}</strong>. <br />
+            Please click it to activate your workspace.
+          </p>
+          <Link 
+            href="/auth/login" 
+            className="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-900 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Sign In
+          </Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white flex">
-      {/* Left — Image Panel */}
-      <div className="hidden lg:flex flex-col w-1/2 bg-slate-950 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-black" />
-        <div className="relative z-10 flex flex-col h-full p-12">
-          <div className="flex items-center gap-3">
-            <Image src="/apexotel.png" alt="Apexotel" width={32} height={32} className="object-contain brightness-0 invert opacity-90" />
-            <span className="text-sm font-bold text-white">Apexotel Workforce</span>
-          </div>
+    <div className="min-h-screen bg-white flex selection:bg-brand-accent/30">
+      {/* Left Panel — Feature Showcase */}
+      <div className="hidden lg:flex flex-col w-[45%] bg-[#020817] relative overflow-hidden">
+        {/* Dynamic Background Elements */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-30">
+          <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-blue-600/20 blur-[120px]" />
+          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-600/10 blur-[100px]" />
+        </div>
+        
+        {/* Content */}
+        <div className="relative z-10 flex flex-col h-full p-16 justify-between">
+          <div className="space-y-12">
+            {/* Logo */}
+            <div className="flex items-center gap-4">
+              <div className="relative w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
+                <Image 
+                  src="/apexotel.png" 
+                  alt="Apexotel" 
+                  width={32} 
+                  height={32} 
+                  className="object-contain brightness-0 invert" 
+                />
+              </div>
+              <div>
+                <p className="text-xl font-bold text-white tracking-tight leading-none">Apexotel</p>
+                <p className="text-xs font-semibold text-blue-400 uppercase tracking-[0.2em] mt-1">Workforce</p>
+              </div>
+            </div>
 
-          <div className="flex-1 flex flex-col justify-center space-y-8">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-extrabold text-white leading-tight">
-                Built for teams<br />
-                <span className="text-slate-400">that mean business.</span>
-              </h2>
-              <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
-                Create your free workspace in 2 minutes. Manage your entire workforce from day one.
+            {/* Hero Section */}
+            <div className="space-y-6">
+              <h1 className="text-4xl font-extrabold text-white leading-tight tracking-tight">
+                Built for teams that <br />
+                <span className="text-white/40">mean excellence.</span>
+              </h1>
+              <p className="text-slate-400 text-lg leading-relaxed max-w-sm">
+                Create your premium workspace in seconds. Manage operations with enterprise-grade tools.
               </p>
             </div>
 
-            {/* Feature list */}
-            <div className="space-y-3">
+            {/* Feature List */}
+            <div className="space-y-5">
               {[
-                { icon: '⏱', text: 'Real-time clock-in tracking' },
-                { icon: '✅', text: 'Task delegation & monitoring' },
-                { icon: '📋', text: 'Daily logs & timecard approvals' },
-                { icon: '📊', text: 'Payroll-ready CSV exports' },
-              ].map(f => (
-                <div key={f.text} className="flex items-center gap-3">
-                  <div className="w-7 h-7 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center text-sm shrink-0">{f.icon}</div>
-                  <span className="text-slate-300 text-sm">{f.text}</span>
+                { icon: CheckCircle2, text: 'Real-time attendance tracking', color: 'text-blue-400' },
+                { icon: CheckCircle2, text: 'Advanced task automation', color: 'text-indigo-400' },
+                { icon: CheckCircle2, text: 'Secure timecard management', color: 'text-sky-400' },
+              ].map((f, i) => (
+                <div key={i} className="flex items-center gap-4 animate-in slide-in-from-left duration-500" style={{ animationDelay: `${i * 100}ms` }}>
+                  <div className={`w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center ${f.color}`}>
+                    <f.icon className="w-4 h-4" />
+                  </div>
+                  <span className="text-slate-300 font-medium">{f.text}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <p className="text-xs text-slate-600">© 2026 Apexotel. All rights reserved.</p>
+          <div className="pt-12 border-t border-white/5">
+            <p className="text-slate-600 text-xs font-bold uppercase tracking-widest">© 2026 Apexotel Technologies</p>
+          </div>
         </div>
       </div>
 
-      {/* Right — Form Panel */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-sm space-y-7">
-          <div className="flex lg:hidden items-center gap-2.5 mb-2">
-            <Image src="/apexotel.png" alt="Apexotel" width={28} height={28} className="object-contain" />
-            <span className="text-sm font-bold text-slate-900">Apexotel Workforce</span>
+      {/* Right Panel — Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-slate-50/50">
+        <div className="w-full max-w-[420px] space-y-10">
+          <div className="space-y-2">
+            <h2 className="text-3xl font-black text-slate-950 tracking-tight">Create Account</h2>
+            <p className="text-slate-500 font-medium tracking-tight">Set up your personal identity on Apexotel</p>
           </div>
 
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>
-            <p className="text-sm text-slate-500 mt-1">Free forever. No credit card required.</p>
-          </div>
-
-          <form onSubmit={handleRegister} className="space-y-4">
+          <form onSubmit={handleRegister} className="space-y-6">
             {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl">{error}</div>
+              <div className="animate-in fade-in slide-in-from-top-2 duration-300 p-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                {error}
+              </div>
             )}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Full Name</label>
-              <input type="text" placeholder="Warren Jacaban" value={fullName} onChange={e => setFullName(e.target.value)} required
-                className="w-full border border-slate-200 bg-slate-50 focus:bg-white text-slate-900 placeholder-slate-400 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all" />
+
+            <div className="space-y-4">
+              <div className="space-y-2 group">
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1 transition-colors group-focus-within:text-brand-accent">Legal Full Name</label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 transition-colors group-focus-within:text-brand-accent" />
+                  <input
+                    type="text"
+                    placeholder="Warren Dave Jacaban"
+                    value={fullName}
+                    onChange={e => setFullName(e.target.value)}
+                    required
+                    className="w-full h-14 pl-12 pr-6 border border-slate-200 bg-white text-slate-900 placeholder:text-slate-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-brand-accent transition-all font-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2 group">
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1 transition-colors group-focus-within:text-brand-accent">Professional Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 transition-colors group-focus-within:text-brand-accent" />
+                  <input
+                    type="email"
+                    placeholder="name@organization.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                    className="w-full h-14 pl-12 pr-6 border border-slate-200 bg-white text-slate-900 placeholder:text-slate-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-brand-accent transition-all font-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2 group">
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1 transition-colors group-focus-within:text-brand-accent">Secure Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 transition-colors group-focus-within:text-brand-accent" />
+                  <input
+                    type="password"
+                    placeholder="Min. 8 characters"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    className="w-full h-14 pl-12 pr-6 border border-slate-200 bg-white text-slate-900 placeholder:text-slate-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-brand-accent transition-all font-medium"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Email</label>
-              <input type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} required
-                className="w-full border border-slate-200 bg-slate-50 focus:bg-white text-slate-900 placeholder-slate-400 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all" />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Password</label>
-              <input type="password" placeholder="Min. 6 characters" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
-                className="w-full border border-slate-200 bg-slate-50 focus:bg-white text-slate-900 placeholder-slate-400 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all" />
-            </div>
-            <button type="submit" disabled={loading}
-              className="w-full bg-slate-900 hover:bg-slate-700 text-white font-semibold py-3.5 rounded-xl transition-all text-sm disabled:opacity-60 mt-1">
-              {loading ? 'Creating account...' : 'Create Account →'}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="group relative w-full h-14 bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white rounded-2xl transition-all overflow-hidden disabled:opacity-70 mt-2"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest">
+                {loading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    Create My Account
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </span>
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-500">
+          <p className="text-center text-slate-500 text-sm font-medium">
             Already have an account?{' '}
-            <Link href="/auth/login" className="text-slate-900 font-semibold hover:underline">Sign in</Link>
+            <Link href="/auth/login" className="text-blue-600 font-bold hover:text-blue-700 transition-colors">
+              Sign in here
+            </Link>
           </p>
         </div>
       </div>

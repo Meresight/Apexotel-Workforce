@@ -13,7 +13,11 @@ import {
   CheckSquare,
   ChevronLeft,
   ChevronRight,
-  Settings
+  Settings,
+  HelpCircle,
+  Bell,
+  Search,
+  Plus
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -27,14 +31,14 @@ export default function Sidebar({ role }: SidebarProps) {
 
   const bossLinks = [
     { name: 'Live Roster', href: '/dashboard/boss', icon: LayoutDashboard },
-    { name: 'Team', href: '/dashboard/boss/employees', icon: Users },
-    { name: 'Tasks', href: '/dashboard/boss/tasks', icon: CheckSquare },
+    { name: 'Team Hub', href: '/dashboard/boss/employees', icon: Users },
+    { name: 'Task Board', href: '/dashboard/boss/tasks', icon: CheckSquare },
     { name: 'Daily Logs', href: '/dashboard/boss/logs', icon: ClipboardList },
     { name: 'Timecards', href: '/dashboard/boss/timecards', icon: FileText },
   ]
 
   const employeeLinks = [
-    { name: 'Dashboard', href: '/dashboard/employee', icon: LayoutDashboard },
+    { name: 'Workspace', href: '/dashboard/employee', icon: LayoutDashboard },
     { name: 'My Tasks', href: '/dashboard/employee/tasks', icon: CheckSquare },
     { name: 'Submit Log', href: '/dashboard/employee/log', icon: ClipboardList },
     { name: 'History', href: '/dashboard/employee/history', icon: History },
@@ -44,95 +48,117 @@ export default function Sidebar({ role }: SidebarProps) {
 
   return (
     <div className={cn(
-      "hidden md:flex flex-col bg-white border-r border-slate-200 transition-all duration-300 ease-in-out relative",
-      isMinimized ? "w-[68px]" : "w-56"
+      "hidden md:flex flex-col bg-[#020617] transition-all duration-500 ease-in-out relative z-30 selection:bg-blue-500/30",
+      isMinimized ? "w-[88px]" : "w-64"
     )}>
-      {/* Toggle Button */}
+      {/* Premium Toggle Button */}
       <button
         onClick={() => setIsMinimized(!isMinimized)}
-        className="absolute -right-3 top-[72px] h-6 w-6 rounded-full border border-slate-200 bg-white text-slate-400 hover:text-slate-700 hover:border-slate-300 z-50 flex items-center justify-center shadow-sm transition-all"
+        className="absolute -right-3.5 top-14 h-7 w-7 rounded-full border border-slate-800 bg-[#020617] text-slate-400 hover:text-white hover:border-slate-600 z-50 flex items-center justify-center shadow-2xl transition-all group active:scale-90"
       >
-        {isMinimized ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+        {isMinimized ? <Plus className="h-3.5 w-3.5 rotate-45" /> : <ChevronLeft className="h-4 w-4" />}
       </button>
 
-      {/* Logo */}
+      {/* Logo Section */}
       <div className={cn(
-        "flex items-center border-b border-slate-100 h-16 px-4 shrink-0",
-        isMinimized ? "justify-center" : "gap-2.5"
+        "flex items-center h-20 px-6 shrink-0",
+        isMinimized ? "justify-center" : "gap-3"
       )}>
-        <Image src="/apexotel.png" alt="Apexotel" width={28} height={28} className="object-contain shrink-0" />
+        <div className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl shrink-0 transition-transform hover:scale-105">
+          <Image 
+            src="/apexotel.png" 
+            alt="Apexotel" 
+            width={22} 
+            height={22} 
+            className="object-contain brightness-0 invert" 
+          />
+        </div>
         {!isMinimized && (
-          <span className="text-sm font-bold text-slate-900 truncate">Apexotel</span>
+          <div className="flex flex-col animate-in fade-in slide-in-from-left-2 duration-500">
+            <span className="text-sm font-black text-white tracking-tight leading-none">Apexotel</span>
+            <span className="text-[10px] font-bold text-blue-500/80 uppercase tracking-widest mt-0.5">Workforce</span>
+          </div>
         )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-        {!isMinimized && (
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 pt-2 pb-1">
-            {role === 'boss' ? 'Management' : 'My Workspace'}
-          </p>
-        )}
-        {links.map((link) => {
-          const isActive = pathname === link.href
-          return (
-            <Link
-              key={link.name}
-              href={link.href}
-              title={isMinimized ? link.name : undefined}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all group relative",
-                isActive
-                  ? "bg-slate-100 text-slate-900"
-                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
-              )}
-            >
-              <link.icon className={cn("shrink-0", isActive ? "text-slate-900" : "text-slate-400 group-hover:text-slate-700", isMinimized ? "w-5 h-5 mx-auto" : "w-4 h-4")} />
-              {!isMinimized && <span>{link.name}</span>}
-            </Link>
-          )
-        })}
+      <nav className="flex-1 px-4 py-6 space-y-8 overflow-y-auto scrollbar-hide">
+        {/* Main Menu */}
+        <div className="space-y-1.5">
+          {!isMinimized && (
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-4 mb-4">
+              {role === 'boss' ? 'Management' : 'My Workspace'}
+            </p>
+          )}
+          {links.map((link) => {
+            const isActive = pathname === link.href
+            return (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-2xl transition-all group relative duration-300",
+                  isActive
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <link.icon className={cn("shrink-0 transition-colors", isActive ? "text-white" : "text-slate-500 group-hover:text-blue-400", isMinimized ? "w-6 h-6 mx-auto" : "w-5 h-5")} />
+                {!isMinimized && <span className="animate-in fade-in duration-500">{link.name}</span>}
+                {isActive && !isMinimized && (
+                   <div className="absolute right-3 w-1.5 h-1.5 rounded-full bg-white/50" />
+                )}
+              </Link>
+            )
+          })}
+        </div>
 
-        {/* Divider */}
-        <div className="my-4 border-t border-slate-50" />
-
-        {/* System Links */}
-        {!isMinimized && (
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 pb-1">
-            System
-          </p>
-        )}
-        {[
-          { name: 'Profile', href: '/dashboard/profile', icon: Users },
-          { name: 'Settings', href: '/dashboard/settings', icon: Settings }
-        ].map((link) => {
-          const isActive = pathname === link.href
-          const Icon = link.icon
-          return (
-            <Link
-              key={link.name}
-              href={link.href}
-              title={isMinimized ? link.name : undefined}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all group relative",
-                isActive
-                  ? "bg-slate-100 text-slate-900"
-                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
-              )}
-            >
-              <Icon className={cn("shrink-0", isActive ? "text-slate-900" : "text-slate-400 group-hover:text-slate-700", isMinimized ? "w-5 h-5 mx-auto" : "w-4 h-4")} />
-              {!isMinimized && <span>{link.name}</span>}
-            </Link>
-          )
-        })}
+        {/* System Settings */}
+        <div className="space-y-1.5 pt-4 border-t border-white/5">
+          {!isMinimized && (
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-4 mb-4">
+              System Settings
+            </p>
+          )}
+          {[
+            { name: 'Profile Hub', href: '/dashboard/profile', icon: Users },
+            { name: 'System Settings', href: '/dashboard/settings', icon: Settings },
+            { name: 'Global Help', href: '/dashboard/help', icon: HelpCircle }
+          ].map((link) => {
+            const isActive = pathname === link.href
+            return (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-2xl transition-all group relative duration-300",
+                  isActive
+                    ? "bg-slate-800 text-white shadow-lg"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <link.icon className={cn("shrink-0 transition-colors", isActive ? "text-white" : "text-slate-500 group-hover:text-blue-400", isMinimized ? "w-6 h-6 mx-auto" : "w-5 h-5")} />
+                {!isMinimized && <span className="animate-in fade-in duration-500">{link.name}</span>}
+              </Link>
+            )
+          })}
+        </div>
       </nav>
 
-      {/* Footer */}
-      {!isMinimized && (
-        <div className="p-4 border-t border-slate-100">
-          <p className="text-[10px] text-slate-400 tracking-tight font-medium outline-none">Apexotel Workforce v1.1</p>
-        </div>
-      )}
+      {/* Footer / User Badge */}
+      <div className="p-4 border-t border-white/5 bg-black/20">
+        {!isMinimized ? (
+          <div className="flex flex-col gap-2 p-3 rounded-2xl bg-white/5 border border-white/5">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Version</span>
+              <span className="text-[10px] font-bold text-blue-500 bg-blue-500/10 px-1.5 py-0.5 rounded">2.4.0</span>
+            </div>
+            <p className="text-[10px] text-slate-600 font-medium tracking-tight">Apexotel Workforce OS</p>
+          </div>
+        ) : (
+          <div className="flex justify-center text-slate-700 font-black text-[10px]">V2</div>
+        )}
+      </div>
     </div>
   )
 }
